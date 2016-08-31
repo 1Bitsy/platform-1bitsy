@@ -122,6 +122,7 @@ env.Append(
 )
 
 if env.subst("$UPLOAD_PROTOCOL") == "gdb":
+    # TODO: Add support for a platform-level upload.gdb
     if not isfile(join(env.subst("$PROJECT_DIR"), "upload.gdb")):
         env.Exit(
             "Error: You are using GDB as firmware uploader. "

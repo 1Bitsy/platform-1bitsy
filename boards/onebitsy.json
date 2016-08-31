@@ -1,0 +1,25 @@
+{
+    "onebitsy": {
+        "build": {
+					"core": "stm32", 
+          "cpu": "cortex-m4", 
+          "f_cpu": "168000000L", 
+          "mcu": "stm32f4x5rgt6",
+					"ldscript": "stm32f4-1bitsy.ld",
+          "variant": "stm32f4"
+
+        },
+        "frameworks": [
+					"libopencm3"
+				],
+        "name": "onebitsy",
+        "platform": "onebitsy",
+        "upload": {
+          "maximum_ram_size": 393216, 
+          "maximum_size": 1048576, 
+          "protocol": "gdb"
+          },
+        "url": "https://github.com/1BitSy/",
+        "vendor": "1bitsquared"
+    }
+}
