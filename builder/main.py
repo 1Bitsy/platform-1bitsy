@@ -19,9 +19,16 @@
 from os.path import isfile, join
 
 from SCons.Script import (COMMAND_LINE_TARGETS, AlwaysBuild, Builder, Default,
-                          DefaultEnvironment)
-
+                          DefaultEnvironment,Environment)
+#Environment
+#Exit, GetOption
+#Variables
+#,SConscript
 env = DefaultEnvironment()
+
+for keys,values in env.items():
+    break
+    print keys,values
 
 env.Replace(
     AR="arm-none-eabi-ar",
@@ -60,16 +67,14 @@ env.Replace(
         "-Wl,--gc-sections,--relax",
         "-mthumb",
         "-nostartfiles",
-        "-nostdlib"
+        "-nostdlib",
     ],
 
     LIBS=["c", "gcc", "m", "stdc++", "nosys"],
 
-    UPLOADER="st-flash",
+    UPLOADER="gdb",
     UPLOADERFLAGS=[
-        "write",        # write in flash
-        "$SOURCES",     # firmware path to flash
-        "0x08000000"    # flash start adress
+        #TODO Probably need stuff here
     ],
     UPLOADCMD='$UPLOADER $UPLOADERFLAGS',
 
@@ -82,13 +87,13 @@ env.Replace(
 if "BOARD" in env:
     env.Append(
         CCFLAGS=[
-            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
+            "-mcpu=%s" % env["BOARD_OPTIONS"]["build"]["cpu"]
         ],
         CPPDEFINES=[
-            env.BoardConfig().get("build.variant", "").upper()
+            env["BOARD_OPTIONS"]["build"]["variant"].upper()
         ],
         LINKFLAGS=[
-            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
+	        "-mcpu=%s" % env["BOARD_OPTIONS"]["build"]["cpu"]
         ]
     )
 
@@ -97,7 +102,7 @@ env.Append(
 
     BUILDERS=dict(
         ElfToBin=Builder(
-            action=env.VerboseAction(" ".join([
+            action=env.Action(" ".join([
                 "$OBJCOPY",
                 "-O",
                 "binary",
@@ -107,7 +112,7 @@ env.Append(
             suffix=".bin"
         ),
         ElfToHex=Builder(
-            action=env.VerboseAction(" ".join([
+            action=env.Action(" ".join([
                 "$OBJCOPY",
                 "-O",
                 "ihex",
@@ -162,7 +167,7 @@ else:
 
 target_size = env.Alias(
     "size", target_elf,
-    env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE"))
+    env.Action("$SIZEPRINTCMD", "Calculating size $SOURCE"))
 AlwaysBuild(target_size)
 
 #
@@ -172,13 +177,15 @@ AlwaysBuild(target_size)
 if "mbed" in env.subst("$PIOFRAMEWORK") and not env.subst("$UPLOAD_PROTOCOL"):
     upload = env.Alias(
         ["upload", "uploadlazy"], target_firm,
-        [env.VerboseAction(env.AutodetectUploadPort,
+        [env.Action(env.AutodetectUploadPort,
                            "Looking for upload disk..."),
-         env.VerboseAction(env.UploadToDisk, "Uploading $SOURCE")])
+         env.Action(env.UploadToDisk, "Uploading $SOURCE")])
 else:
     upload = env.Alias(["upload", "uploadlazy"], target_firm,
-                       env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
+                       env.Action("$UPLOADCMD", "Uploading $SOURCE"))
 AlwaysBuild(upload)
+
+
 
 #
 # Default targets
