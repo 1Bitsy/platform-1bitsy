@@ -1,14 +1,11 @@
 import os
+from platformio.managers.platform import PlatformBase
 
-from platformio.platforms.ststm32 import Ststm32Platform
 
-
-class OnebitsyPlatform(Ststm32Platform):
+class OnebitsyPlatform(PlatformBase):
 
     """
-    ST STM32 using GDB as uploader
-
-    http://www.st.com/web/en/catalog/mmc/FM141/SC1169?sc=stm32
+    Install tooling for 1bitSquared 1Bitsy
     """
 
     def get_build_script(self):
@@ -17,3 +14,12 @@ class OnebitsyPlatform(Ststm32Platform):
             os.path.dirname(os.path.realpath(__file__)),
             "onebitsy-builder.py"
         )
+
+    def configure_default_packages(self, variables, targets):
+        if variables.get("board"):
+            board_config = self.board_config(variables.get("board"))
+            toolchain = "toolchain-gccarmnoneeabi"
+            self.packages[toolchain]['optional'] = False
+
+        return PlatformBase.configure_default_packages(
+            self, variables, targets)
