@@ -102,7 +102,7 @@ env.Append(
 
     BUILDERS=dict(
         ElfToBin=Builder(
-            action=env.Action(" ".join([
+            action=env.VerboseAction(" ".join([
                 "$OBJCOPY",
                 "-O",
                 "binary",
@@ -112,7 +112,7 @@ env.Append(
             suffix=".bin"
         ),
         ElfToHex=Builder(
-            action=env.Action(" ".join([
+            action=env.VerboseAction(" ".join([
                 "$OBJCOPY",
                 "-O",
                 "ihex",
@@ -167,7 +167,7 @@ else:
 
 target_size = env.Alias(
     "size", target_elf,
-    env.Action("$SIZEPRINTCMD", "Calculating size $SOURCE"))
+    env.VerboseAction("$SIZEPRINTCMD", "Calculating size $SOURCE"))
 AlwaysBuild(target_size)
 
 #
@@ -177,12 +177,12 @@ AlwaysBuild(target_size)
 if "mbed" in env.subst("$PIOFRAMEWORK") and not env.subst("$UPLOAD_PROTOCOL"):
     upload = env.Alias(
         ["upload", "uploadlazy"], target_firm,
-        [env.Action(env.AutodetectUploadPort,
+        [env.VerboseAction(env.AutodetectUploadPort,
                            "Looking for upload disk..."),
-         env.Action(env.UploadToDisk, "Uploading $SOURCE")])
+         env.VerboseAction(env.UploadToDisk, "Uploading $SOURCE")])
 else:
     upload = env.Alias(["upload", "uploadlazy"], target_firm,
-                       env.Action("$UPLOADCMD", "Uploading $SOURCE"))
+                       env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
 AlwaysBuild(upload)
 
 
