@@ -4,7 +4,7 @@
   "description": "An open source development platform designed and supported by 1bitsquared",
   "url": "https://github.com/1bitsy/",
   "homepage": "http://1bitsquared.com/",
-  "license": "TEMPORARILY NOT AVAILABLE",
+  "license": "Apache-2.0",
   "engines": {
     "platformio": "^3.0.0",
     "scons": ">=2.3.0,<2.6.0"
