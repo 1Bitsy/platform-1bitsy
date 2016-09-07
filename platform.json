@@ -1,8 +1,9 @@
 {
   "name": "onebitsy",
-  "title": "1bitsy",
+  "title": "onebitsy",
   "description": "An open source development platform designed and supported by 1bitsquared",
   "url": "https://github.com/1bitsy/",
+  "vendor": "1bitSquared",
   "homepage": "http://1bitsquared.com/",
   "license": "Apache-2.0",
   "engines": {

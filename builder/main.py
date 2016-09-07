@@ -16,14 +16,14 @@
     Builder for ST STM32 Series ARM microcontrollers.
 """
 
+# This page details all the stuff needed to patch this up
+# http://www.scons.org/doc/production/HTML/scons-user.html#cv-_LIBFLAGS
+
 from os.path import isfile, join
 
 from SCons.Script import (COMMAND_LINE_TARGETS, AlwaysBuild, Builder, Default,
                           DefaultEnvironment,Environment)
-#Environment
-#Exit, GetOption
-#Variables
-#,SConscript
+
 env = DefaultEnvironment()
 
 for keys,values in env.items():
@@ -87,13 +87,13 @@ env.Replace(
 if "BOARD" in env:
     env.Append(
         CCFLAGS=[
-            "-mcpu=%s" % env["BOARD_OPTIONS"]["build"]["cpu"]
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
         ],
         CPPDEFINES=[
-            env["BOARD_OPTIONS"]["build"]["variant"].upper()
+            env.BoardConfig().get("build.variant", "").upper()
         ],
         LINKFLAGS=[
-	        "-mcpu=%s" % env["BOARD_OPTIONS"]["build"]["cpu"]
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
         ]
     )
 
