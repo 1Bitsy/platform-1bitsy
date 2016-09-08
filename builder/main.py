@@ -67,7 +67,8 @@ env.Replace(
         "-Wl,--gc-sections,--relax",
         "-mthumb",
         "-nostartfiles",
-        "-nostdlib",
+        "-nostdlib"
+        #,"-v"
     ],
 
     LIBS=["c", "gcc", "m", "stdc++", "nosys"],
@@ -93,10 +94,16 @@ if "BOARD" in env:
             env.BoardConfig().get("build.variant", "").upper()
         ],
         LINKFLAGS=[
-            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
-        ]
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+            "-Wl,-T $PROJECT_DIR/ldscripts/stm32f4-1bitsy.ld"
+			,"-v"
+        ],
+		#This should work, but doesn't. Overriding the target linkable
+		#sdcript in LINKFLAGS works for now
+		LDSCRIPT_PATH="stm32f4-1bitsy.ld",
+		LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
     )
-
+	
 env.Append(
     ASFLAGS=env.get("CCFLAGS", [])[:],
 
@@ -143,13 +150,17 @@ if env.subst("$UPLOAD_PROTOCOL") == "gdb":
             '"%s"' % join("$PROJECT_DIR", "upload.gdb")
         ],
 
-        UPLOADCMD='$UPLOADER $UPLOADERFLAGS'
+        UPLOADCMD='$UPLOADER $UPLOADERFLAGS',
     )
+	
 
 #
 # Target: Build executable and linkable firmware
 #
-
+print "HELLO WORLD YOU ARE HERE"
+print env.get("LINKCOM")
+print "HELLO WORLD YOU ARE HERE"
+# https://github.com/platformio/platformio/blob/8a379d2db26ff0deb37be83e82d1abe72e5439f8/platformio/builder/tools/platformio.py#L68
 target_elf = env.BuildProgram()
 
 #
