@@ -1,14 +1,20 @@
 # 1bitsy for Platform.io 
 
 
-This requires the 3.0 version of Platform.io. If the About page indicates version 2.x.x, then enable the development version of 3.0 with the following settings from the top menu:
+This requires the 3.0 version of Platform.io. If the About page indicates version 2.x.x, then update to V3.x.x from the PlatformIO start page. 
 
-> Platform.io
->> Settings
->>> Platform.io IDE
->>>> Use development version
+# Installing the OneBitsy toolchain.
 
-Platform.io will the update to the newest version
+Run 
+```
+platformio install platforms https://github.com/tekdemo/platform-onebitsy.git
+```
+
+For development, install the git repository by itself. 
+```
+cd ~/.platformio/platforms/
+git clone https://github.com/tekdemo/platform-onebitsy.git -o onebitsy
+```
 
 #TODO
 - [ ] Need to automatically run make on the `libopencm3` before attempting to build the project
