@@ -22,3 +22,12 @@ Platform.io will the update to the newest version
 	- [ ] Uart?
 	- [ ] USB without BMP? 
 
+## Basics of the build system
+
+Most of it is in `builder/main.py`. For the most part, everything is just setting up flags, which are appropriately named. 
+
+The "build recipes" start ~L#121 at `BUILDERS=dict(...`. These very closely match the Makefile for the system. 
+	
+Conspicuously missing is any sort of a .map file at this time. 
+
+Upload stuff is currently left in from the stock STM32 project, pending the build process working right. 
