@@ -15,6 +15,7 @@ Platform.io will the update to the newest version
 - [X] Still has a linker config issue. Have leads, pretty close to figuring this out methinks. 
 	- Useful: http://www.scons.org/doc/production/HTML/scons-user.html
 	- http://docs.platformio.org/en/stable/platforms/creating_platform.html
+	- https://github.com/platformio/platformio/blob/8a379d2db26ff0deb37be83e82d1abe72e5439f8/platformio/builder/tools/platformio.py#L68
 - [ ] Upload
 	- [ ] JTAG
 	- [ ] SWDIO
