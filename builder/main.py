@@ -16,24 +16,12 @@
     Builder for ST STM32 Series ARM microcontrollers.
 """
 
-# This page details all the stuff needed to patch this up
-# http://www.scons.org/doc/production/HTML/scons-user.html#cv-_LIBFLAGS
-
 from os.path import isfile, join
 
 from SCons.Script import (COMMAND_LINE_TARGETS, AlwaysBuild, Builder, Default,
                           DefaultEnvironment,Environment)
 
 env = DefaultEnvironment()
-
-for keys,values in env.items():
-	break;
-	if keys=="ENV": continue
-	print keys,"== ",values
-	# PIOPLATFORM = onebitsy
-
-print "What about these ones?"
-print "PIOHOME_DIR=>",env.get("PIOHOME_DIR")
 
 env.Replace(
     AR="arm-none-eabi-ar",
@@ -51,16 +39,49 @@ env.Replace(
     CCFLAGS=[
         "-g",   # include debugging info (so errors include line numbers)
         "-Os",  # optimize for size
-        "-ffunction-sections",  # place each function in its own section
-        "-fdata-sections",
-        "-Wall",
+        # "-ffunction-sections",  # place each function in its own section
+        # "-fdata-sections",
+        # "-Wall",
         "-mthumb",
-        "-nostdlib"
+        # "-nostdlib",
+        
+        # From OneBitsy makefile
+        # "-Os",
+        # "-g",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wextra",
+        "-Wshadow",
+        "-Wimplicit-function-declaration",
+        "-Wredundant-decls",
+        "-Wmissing-prototypes",
+        "-Wstrict-prototypes",
+        "-fno-common",
+
+        #C/C++ Common
+        "-MD",
+        "-Wall",
+        "-Wundef"
     ],
 
     CXXFLAGS=[
-        "-fno-rtti",
-        "-fno-exceptions"
+        # "-fno-rtti",
+        # "-fno-exceptions"
+        
+        #from makefile
+        "-Os",
+        "-g",
+        "-Wextra",
+        "-Wshadow",
+        "-Wredundant-decls",
+        " -Weffc++",
+		"-fno-common",
+		"-ffunction-sections",
+		"-fdata-sections",
+        #C/C++ Common
+        "-MD",
+        "-Wall",
+        "-Wundef"
     ],
 
     CPPDEFINES=[
@@ -68,12 +89,19 @@ env.Replace(
     ],
 
     LINKFLAGS=[
-        "-Os",
-        "-Wl,--gc-sections,--relax",
-        "-mthumb",
-        "-nostartfiles",
-        "-nostdlib"
+        # "-Os",
+        # "-Wl,--gc-sections,--relax",
+        # "-mthumb",
+        # "-nostartfiles",
+        # "-nostdlib"
         #,"-v"
+        
+        # From Makefile
+		"--static",
+		"-nostartfiles",
+		# -Wl,-Map=$(*).map # Where do I find and add this?!?
+		"-Wl,--gc-sections",
+		"-Wl,--print-gc-sections"
     ],
 
     LIBS=["c", "gcc", "m", "stdc++", "nosys"],
@@ -106,20 +134,17 @@ if "BOARD" in env:
             #"-L /home/tekdemo/.platformio/platforms/onebitsy/ldscripts/"
             "-Wl,-T %s" % env.BoardConfig().get("build.ldscript"),
         ],
-		#This should work, but doesn't. Overriding the target linkable
-		#sdcript in LINKFLAGS works for now
-		LDSCRIPT_PATH="stm32f4-1bitsy.ld"
-		#,LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
-		# By default LIBPATH is set to  ['/home/tekdemo/.platformio/platforms/onebitsy/ldscripts']
-		# which is already correct
+        #This should work, but doesn't. Overriding the target linkable
+        #sdcript in LINKFLAGS works for now
+        #
+        # Apparently not required if the path is right! :D
+        # LDSCRIPT_PATH="stm32f4-1bitsy.ld"
+        #
+        #,LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
+        # By default LIBPATH is set to  ['/home/tekdemo/.platformio/platforms/onebitsy/ldscripts']
+        # which is already correct
 
     )
-print env.get("LINKFLAGS")
-print "-L %s/platforms/%s/ldscripts/" % (
-	env.get("PIOHOME_DIR"),
-	env.get("PIOENV"))
-print "-L /home/tekdemo/.platformio/platforms/onebitsy/ldscripts/"
-
 
 env.Append(
     ASFLAGS=env.get("CCFLAGS", [])[:],
@@ -140,8 +165,8 @@ env.Append(
                 "$OBJCOPY",
                 "-O",
                 "ihex",
-                "-R",
-                ".eeprom",
+                # "-R",
+                # ".eeprom",
                 "$SOURCES",
                 "$TARGET"
             ]), "Building $TARGET"),
@@ -169,15 +194,10 @@ if env.subst("$UPLOAD_PROTOCOL") == "gdb":
 
         UPLOADCMD='$UPLOADER $UPLOADERFLAGS',
     )
-	
 
 #
 # Target: Build executable and linkable firmware
 #
-print "HELLO WORLD YOU ARE HERE"
-print env.get("LINKCOM")
-print "HELLO WORLD YOU ARE HERE"
-# https://github.com/platformio/platformio/blob/8a379d2db26ff0deb37be83e82d1abe72e5439f8/platformio/builder/tools/platformio.py#L68
 target_elf = env.BuildProgram()
 
 #
@@ -212,8 +232,6 @@ else:
     upload = env.Alias(["upload", "uploadlazy"], target_firm,
                        env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
 AlwaysBuild(upload)
-
-
 
 #
 # Default targets
