@@ -27,8 +27,13 @@ from SCons.Script import (COMMAND_LINE_TARGETS, AlwaysBuild, Builder, Default,
 env = DefaultEnvironment()
 
 for keys,values in env.items():
-    break
-    print keys,values
+	break;
+	if keys=="ENV": continue
+	print keys,"== ",values
+	# PIOPLATFORM = onebitsy
+
+print "What about these ones?"
+print "PIOHOME_DIR=>",env.get("PIOHOME_DIR")
 
 env.Replace(
     AR="arm-none-eabi-ar",
@@ -93,17 +98,29 @@ if "BOARD" in env:
         CPPDEFINES=[
             env.BoardConfig().get("build.variant", "").upper()
         ],
+        
         LINKFLAGS=[
             "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-            "-Wl,-T $PROJECT_DIR/ldscripts/stm32f4-1bitsy.ld"
-			,"-v"
+            "-L $PIOHOME_DIR/platforms/$PIOENV/ldscripts/"
+            #vv Example of a working line!
+            #"-L /home/tekdemo/.platformio/platforms/onebitsy/ldscripts/"
+            "-Wl,-T %s" % env.BoardConfig().get("build.ldscript"),
         ],
 		#This should work, but doesn't. Overriding the target linkable
 		#sdcript in LINKFLAGS works for now
-		LDSCRIPT_PATH="stm32f4-1bitsy.ld",
-		LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
+		LDSCRIPT_PATH="stm32f4-1bitsy.ld"
+		#,LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
+		# By default LIBPATH is set to  ['/home/tekdemo/.platformio/platforms/onebitsy/ldscripts']
+		# which is already correct
+
     )
-	
+print env.get("LINKFLAGS")
+print "-L %s/platforms/%s/ldscripts/" % (
+	env.get("PIOHOME_DIR"),
+	env.get("PIOENV"))
+print "-L /home/tekdemo/.platformio/platforms/onebitsy/ldscripts/"
+
+
 env.Append(
     ASFLAGS=env.get("CCFLAGS", [])[:],
 
