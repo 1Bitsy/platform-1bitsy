@@ -109,11 +109,12 @@ if "BOARD" in env:
         ],
 		#This should work, but doesn't. Overriding the target linkable
 		#sdcript in LINKFLAGS works for now
-		LDSCRIPT_PATH="stm32f4-1bitsy.ld"
+		LDSCRIPT_PATH="stm32f4-1bitsy.ld",
 		#,LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
 		# By default LIBPATH is set to  ['/home/tekdemo/.platformio/platforms/onebitsy/ldscripts']
 		# which is already correct
-
+		
+        GDBSCRIPT_PATH=" $PIOHOME_DIR/platforms/$PIOENV/gdbscripts/"
     )
 
 env.Append(
@@ -146,13 +147,17 @@ env.Append(
 )
 
 if env.subst("$UPLOAD_PROTOCOL") == "gdb":
-    # TODO: Add support for a platform-level upload.gdb
+
     if not isfile(join(env.subst("$PROJECT_DIR"), "upload.gdb")):
-        env.Exit(
-            "Error: You are using GDB as firmware uploader. "
-            "Please specify upload commands in upload.gdb "
-            "file in project directory!"
-        )
+        print "Using default upload script."
+        print "Create an `upload.gdb` file in your project directory"
+        print "to override upload option"
+        '"%s"' % join("$GDBSCRIPT_PATH", "upload.gdb")
+    else:
+        print "Using project upload script"
+        '"%s"' % join("$PROJECT_DIR", "upload.gdb")
+
+		
     env.Replace(
         UPLOADER="arm-none-eabi-gdb",
         UPLOADERFLAGS=[
@@ -203,10 +208,13 @@ AlwaysBuild(target_size)
 #     upload = env.Alias(["upload", "uploadlazy"], target_firm,
 #                        env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
 
+
 #From the sTM32-GDB directions, see if this works 
 #https://gist.github.com/valeros/28d84a7a8f78825e6956
-upload = env.Alias(
-    ["upload", "uploadlazy"], target_firm, "$UPLOADCMD")
+if env.BoardConfig().get("upload.protocol")=="gdb":
+	upload = env.Alias(["upload", "uploadlazy"], target_firm, "$UPLOADCMD")
+else:
+	print "Not supported!"
 AlwaysBuild(upload)
 
 
