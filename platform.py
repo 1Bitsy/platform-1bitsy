@@ -8,13 +8,6 @@ class OnebitsyPlatform(PlatformBase):
     Install tooling for 1bitSquared 1Bitsy
     """
 
-    # def get_build_script(self):
-	# 
-    #     return os.path.join(
-    #         os.path.dirname(os.path.realpath(__file__)),
-    #         "builder/main.py"
-    #     )
-
     def configure_default_packages(self, variables, targets):
         if variables.get("board"):
             board_config = self.board_config(variables.get("board"))

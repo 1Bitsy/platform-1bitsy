@@ -72,7 +72,8 @@ env.Replace(
         "-Wl,--gc-sections,--relax",
         "-mthumb",
         "-nostartfiles",
-        "-nostdlib"
+        "-nostdlib",
+        "-DSTM32F4"
         #,"-v"
     ],
 
@@ -192,15 +193,20 @@ AlwaysBuild(target_size)
 # Target: Upload by default .bin file
 #
 
-if "mbed" in env.subst("$PIOFRAMEWORK") and not env.subst("$UPLOAD_PROTOCOL"):
-    upload = env.Alias(
-        ["upload", "uploadlazy"], target_firm,
-        [env.VerboseAction(env.AutodetectUploadPort,
-                           "Looking for upload disk..."),
-         env.VerboseAction(env.UploadToDisk, "Uploading $SOURCE")])
-else:
-    upload = env.Alias(["upload", "uploadlazy"], target_firm,
-                       env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
+# if "mbed" in env.subst("$PIOFRAMEWORK") and not env.subst("$UPLOAD_PROTOCOL"):
+#     upload = env.Alias(
+#         ["upload", "uploadlazy"], target_firm,
+#         [env.VerboseAction(env.AutodetectUploadPort,
+#                            "Looking for upload disk..."),
+#          env.VerboseAction(env.UploadToDisk, "Uploading $SOURCE")])
+# else:
+#     upload = env.Alias(["upload", "uploadlazy"], target_firm,
+#                        env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
+
+#From the sTM32-GDB directions, see if this works 
+#https://gist.github.com/valeros/28d84a7a8f78825e6956
+upload = env.Alias(
+    ["upload", "uploadlazy"], target_firm, "$UPLOADCMD")
 AlwaysBuild(upload)
 
 
