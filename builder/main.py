@@ -49,13 +49,23 @@ env.Replace(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
     CCFLAGS=[
-        "-g",   # include debugging info (so errors include line numbers)
         "-Os",  # optimize for size
+        "-g",   # include debugging info (so errors include line numbers)
+	"-Wextra",
+	"-Wshadow",
+	"-Wimplicit-function-declaration",
+	"-Wredundant-decls",
+	"-Wmissing-prototypes",
+	"-Wstrict-prototypes",
+	"-fno-common",
         "-ffunction-sections",  # place each function in its own section
         "-fdata-sections",
         "-Wall",
+	"-Wundef",
         "-mthumb",
-        "-nostdlib"
+	"-mfloat-abi=hard",
+	"-mfpu=fpv4-sp-d16"
+        #"-nostdlib"
     ],
 
     CXXFLAGS=[
@@ -68,17 +78,20 @@ env.Replace(
     ],
 
     LINKFLAGS=[
-        "-Os",
-        "-Wl,--gc-sections,--relax",
-        "-mthumb",
+	"--static",
         "-nostartfiles",
-        "-nostdlib",
-        "-DSTM32F4"
+        "-Wl,--gc-sections",
+        "-mthumb",
+	"-mfloat-abi=hard",
+	"-mfpu=fpv4-sp-d16"
+	#"-nostdlib",
         #,"-v"
     ],
 
-    LIBS=["c", "gcc", "m", "stdc++", "nosys"],
 
+    #LIBS=["c", "gcc", "m", "stdc++", "nosys"],
+    LIBS=["c", "gcc", "m", "nosys"],
+    
     UPLOADER="gdb",
     UPLOADERFLAGS=[
         #TODO Probably need stuff here
@@ -102,14 +115,14 @@ if "BOARD" in env:
         
         LINKFLAGS=[
             "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
-            "-L $PIOHOME_DIR/platforms/$PIOENV/ldscripts/"
+            "-L$PIOHOME_DIR/platforms/$PIOENV/ldscripts/"
             #vv Example of a working line!
             #"-L /home/tekdemo/.platformio/platforms/onebitsy/ldscripts/"
-            "-Wl,-T %s" % env.BoardConfig().get("build.ldscript"),
+            #"-T%s" % env.BoardConfig().get("build.ldscript"),
         ],
 		#This should work, but doesn't. Overriding the target linkable
 		#sdcript in LINKFLAGS works for now
-		LDSCRIPT_PATH="stm32f4-1bitsy.ld",
+		#LDSCRIPT_PATH="stm32f4-1bitsy.ld",
 		#,LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
 		# By default LIBPATH is set to  ['/home/tekdemo/.platformio/platforms/onebitsy/ldscripts']
 		# which is already correct

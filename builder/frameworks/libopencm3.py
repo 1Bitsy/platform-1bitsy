@@ -162,10 +162,10 @@ if ldscript_path:
 generate_nvic_files()
 
 # override ldscript by libopencm3
-assert "LDSCRIPT_PATH" in env
-env.Replace(
-    LDSCRIPT_PATH=ldscript_path
-)
+#assert "LDSCRIPT_PATH" in env
+#env.Replace(
+#    LDSCRIPT_PATH=ldscript_path
+#)
 
 libs = []
 env.VariantDir(
