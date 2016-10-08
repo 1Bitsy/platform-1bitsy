@@ -165,19 +165,19 @@ if env.subst("$UPLOAD_PROTOCOL") == "gdb":
         print "Using default upload script."
         print "Create an `upload.gdb` file in your project directory"
         print "to override upload option"
-        '"%s"' % join("$GDBSCRIPT_PATH", "upload.gdb")
+        gdbscript="%s" % join("$GDBSCRIPT_PATH", "upload.gdb")
     else:
         print "Using project upload script"
-        '"%s"' % join("$PROJECT_DIR", "upload.gdb")
+        gdbscript="%s" % join("$PROJECT_DIR", "upload.gdb")
 
-		
+
     env.Replace(
         UPLOADER="arm-none-eabi-gdb",
         UPLOADERFLAGS=[
             join("$BUILD_DIR", "firmware.elf"),
             "-batch",
             "-x",
-            '"%s"' % join("$PROJECT_DIR", "upload.gdb")
+            '"%s"' % gdbscript
         ],
 
         UPLOADCMD='$UPLOADER $UPLOADERFLAGS',
