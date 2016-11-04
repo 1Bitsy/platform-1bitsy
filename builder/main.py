@@ -16,12 +16,24 @@
     Builder for ST STM32 Series ARM microcontrollers.
 """
 
+# This page details all the stuff needed to patch this up
+# http://www.scons.org/doc/production/HTML/scons-user.html#cv-_LIBFLAGS
+
 from os.path import isfile, join
 
 from SCons.Script import (COMMAND_LINE_TARGETS, AlwaysBuild, Builder, Default,
-                          DefaultEnvironment)
+                          DefaultEnvironment,Environment)
 
 env = DefaultEnvironment()
+
+for keys,values in env.items():
+	break;
+	if keys=="ENV": continue
+	print keys,"== ",values
+	# PIOPLATFORM = onebitsy
+
+	print "What about these ones?"
+	print "PIOHOME_DIR=>",env.get("PIOHOME_DIR")
 
 env.Replace(
     AR="arm-none-eabi-ar",
@@ -37,13 +49,23 @@ env.Replace(
     ASFLAGS=["-x", "assembler-with-cpp"],
 
     CCFLAGS=[
-        "-g",   # include debugging info (so errors include line numbers)
         "-Os",  # optimize for size
+        "-g",   # include debugging info (so errors include line numbers)
+	"-Wextra",
+	"-Wshadow",
+	"-Wimplicit-function-declaration",
+	"-Wredundant-decls",
+	"-Wmissing-prototypes",
+	"-Wstrict-prototypes",
+	"-fno-common",
         "-ffunction-sections",  # place each function in its own section
         "-fdata-sections",
         "-Wall",
+	"-Wundef",
         "-mthumb",
-        "-nostdlib"
+	"-mfloat-abi=hard",
+	"-mfpu=fpv4-sp-d16"
+        #"-nostdlib"
     ],
 
     CXXFLAGS=[
@@ -56,20 +78,23 @@ env.Replace(
     ],
 
     LINKFLAGS=[
-        "-Os",
-        "-Wl,--gc-sections,--relax",
-        "-mthumb",
+	"--static",
         "-nostartfiles",
-        "-nostdlib"
+        "-Wl,--gc-sections",
+        "-mthumb",
+	"-mfloat-abi=hard",
+	"-mfpu=fpv4-sp-d16"
+	#"-nostdlib",
+        #,"-v"
     ],
 
-    LIBS=["c", "gcc", "m", "stdc++", "nosys"],
 
-    UPLOADER="st-flash",
+    #LIBS=["c", "gcc", "m", "stdc++", "nosys"],
+    LIBS=["c", "gcc", "m", "nosys"],
+    
+    UPLOADER="gdb",
     UPLOADERFLAGS=[
-        "write",        # write in flash
-        "$SOURCES",     # firmware path to flash
-        "0x08000000"    # flash start adress
+        #TODO Probably need stuff here
     ],
     UPLOADCMD='$UPLOADER $UPLOADERFLAGS',
 
@@ -87,9 +112,22 @@ if "BOARD" in env:
         CPPDEFINES=[
             env.BoardConfig().get("build.variant", "").upper()
         ],
+        
         LINKFLAGS=[
-            "-mcpu=%s" % env.BoardConfig().get("build.cpu")
-        ]
+            "-mcpu=%s" % env.BoardConfig().get("build.cpu"),
+            "-L$PIOHOME_DIR/platforms/$PIOENV/ldscripts/"
+            #vv Example of a working line!
+            #"-L /home/tekdemo/.platformio/platforms/onebitsy/ldscripts/"
+            #"-T%s" % env.BoardConfig().get("build.ldscript"),
+        ],
+		#This should work, but doesn't. Overriding the target linkable
+		#sdcript in LINKFLAGS works for now
+		#LDSCRIPT_PATH="stm32f4-1bitsy.ld",
+		#,LIBPATH=["$PROJECT_DIR","$PROJECT_DIR/ldscripts"],
+		# By default LIBPATH is set to  ['/home/tekdemo/.platformio/platforms/onebitsy/ldscripts']
+		# which is already correct
+		
+        GDBSCRIPT_PATH=" $PIOHOME_DIR/platforms/$PIOENV/gdbscripts/"
     )
 
 env.Append(
@@ -122,28 +160,33 @@ env.Append(
 )
 
 if env.subst("$UPLOAD_PROTOCOL") == "gdb":
+
     if not isfile(join(env.subst("$PROJECT_DIR"), "upload.gdb")):
-        env.Exit(
-            "Error: You are using GDB as firmware uploader. "
-            "Please specify upload commands in upload.gdb "
-            "file in project directory!"
-        )
+        print "Using default upload script."
+        print "Create an `upload.gdb` file in your project directory"
+        print "to override upload option"
+        gdbscript="%s" % join("$GDBSCRIPT_PATH", "upload.gdb")
+    else:
+        print "Using project upload script"
+        gdbscript="%s" % join("$PROJECT_DIR", "upload.gdb")
+
+
     env.Replace(
         UPLOADER="arm-none-eabi-gdb",
         UPLOADERFLAGS=[
             join("$BUILD_DIR", "firmware.elf"),
             "-batch",
             "-x",
-            '"%s"' % join("$PROJECT_DIR", "upload.gdb")
+            '"%s"' % gdbscript
         ],
 
-        UPLOADCMD='$UPLOADER $UPLOADERFLAGS'
+        UPLOADCMD='$UPLOADER $UPLOADERFLAGS',
     )
+	
 
 #
 # Target: Build executable and linkable firmware
 #
-
 target_elf = env.BuildProgram()
 
 #
@@ -168,16 +211,26 @@ AlwaysBuild(target_size)
 # Target: Upload by default .bin file
 #
 
-if "mbed" in env.subst("$PIOFRAMEWORK") and not env.subst("$UPLOAD_PROTOCOL"):
-    upload = env.Alias(
-        ["upload", "uploadlazy"], target_firm,
-        [env.VerboseAction(env.AutodetectUploadPort,
-                           "Looking for upload disk..."),
-         env.VerboseAction(env.UploadToDisk, "Uploading $SOURCE")])
+# if "mbed" in env.subst("$PIOFRAMEWORK") and not env.subst("$UPLOAD_PROTOCOL"):
+#     upload = env.Alias(
+#         ["upload", "uploadlazy"], target_firm,
+#         [env.VerboseAction(env.AutodetectUploadPort,
+#                            "Looking for upload disk..."),
+#          env.VerboseAction(env.UploadToDisk, "Uploading $SOURCE")])
+# else:
+#     upload = env.Alias(["upload", "uploadlazy"], target_firm,
+#                        env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
+
+
+#From the sTM32-GDB directions, see if this works 
+#https://gist.github.com/valeros/28d84a7a8f78825e6956
+if env.BoardConfig().get("upload.protocol")=="gdb":
+	upload = env.Alias(["upload", "uploadlazy"], target_firm, "$UPLOADCMD")
 else:
-    upload = env.Alias(["upload", "uploadlazy"], target_firm,
-                       env.VerboseAction("$UPLOADCMD", "Uploading $SOURCE"))
+	print "Not supported!"
 AlwaysBuild(upload)
+
+
 
 #
 # Default targets
