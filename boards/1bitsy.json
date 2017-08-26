@@ -1,7 +1,7 @@
 {
   "name": "1Bitsy",
-  "platform": "1bitsy",
-  "url": "https://github.com/1BitSy/",
+  "platform": "OneBitsy",
+  "url": "http://1bitsy.org",
   "vendor": "1BitSquared",
   "build": {
     "core": "stm32", 

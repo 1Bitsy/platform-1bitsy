@@ -5,7 +5,7 @@ from platformio.managers.platform import PlatformBase
 class OnebitsyPlatform(PlatformBase):
 
     """
-    Install tooling for 1bitSquared 1Bitsy
+    Install tooling for 1BitSquared 1Bitsy
     """
 
     def configure_default_packages(self, variables, targets):
