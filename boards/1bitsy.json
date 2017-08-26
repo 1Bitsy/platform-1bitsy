@@ -1,8 +1,8 @@
 {
-  "name": "onebitsy",
-  "platform": "onebitsy",
+  "name": "1Bitsy",
+  "platform": "1bitsy",
   "url": "https://github.com/1BitSy/",
-  "vendor": "1bitsquared",
+  "vendor": "1BitSquared",
   "build": {
     "core": "stm32", 
     "cpu": "cortex-m4", 

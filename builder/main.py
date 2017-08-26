@@ -30,7 +30,7 @@ for keys,values in env.items():
 	break;
 	if keys=="ENV": continue
 	print keys,"== ",values
-	# PIOPLATFORM = onebitsy
+	# PIOPLATFORM = 1bitsy
 
 	print "What about these ones?"
 	print "PIOHOME_DIR=>",env.get("PIOHOME_DIR")

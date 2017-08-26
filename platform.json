@@ -1,9 +1,9 @@
 {
-  "name": "onebitsy",
-  "title": "onebitsy",
-  "description": "An open source development platform designed and supported by 1bitsquared",
+  "name": "1Bitsy",
+  "title": "1Bitsy",
+  "description": "An open source debuggable ARM Cortex development platform designed and supported by 1BitSquared",
   "url": "https://github.com/1bitsy/",
-  "vendor": "1bitSquared",
+  "vendor": "1BitSquared",
   "homepage": "http://1bitsquared.com/",
   "license": "Apache-2.0",
   "engines": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tekdemo/platform-onebitsy.git"
+    "url": "https://github.com/1bitsy/platform-1bitsy.git"
   },
   "version": "1.0.0",
   "packageRepositories": [

@@ -1,19 +1,18 @@
-# 1bitsy for Platform.io 
+# 1Bitsy for PlatformIO
 
+This requires the 3.0 version of [PlatformIO](http://platformio.org). If the About page indicates version 2.x.x, then update to V3.x.x from the PlatformIO start page. 
 
-This requires the 3.0 version of Platform.io. 
-
-# Installing the OneBitsy toolchain.
+# Installing the 1Bitsy toolchain.
 
 Run 
 ```
-platformio install platforms https://github.com/tekdemo/platform-onebitsy.git
+platformio install platforms https://github.com/1bitsy/platform-1bitsy.git
 ```
 
-For development, install the git repository by itself. 
+For development, install the git repository by itself.
 ```
 cd ~/.platformio/platforms/
-git clone https://github.com/tekdemo/platform-onebitsy.git -o onebitsy
+git clone https://github.com/1bitsy/platform-1bitsy.git -o 1bitsy
 ```
 
 ## Basics of the build system
